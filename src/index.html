@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel='stylesheet'
+      href='https://unpkg.com/normalize.css@7.0.0/normalize.css'/>
+    <link rel='stylesheet'
+      href='http://airnet.org.au/react-audio-player/react-audio-player.min.e53ec6776dd9.css'/>
+    <style>
+
+      html {
+        background: url(https://source.unsplash.com/random);
+        background-size: cover;
+      }
+      body {
+        font-family: Helvetica, Arial, sans serif;
+        font-size:11px;
+        
+      }
+      #amrapPlayer {
+        background-color: rgba(43,255,255,0.6);
+      }
+      .inner {
+        padding:10px;
+        margin: 10px;
+        background-color: rgba(255,255,255,0.4);
+      }
+      #amrapPage {
+        background: #fff;
+         padding:10px;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="amrapRoot"></div> <!-- needed element -->
+    <div id="amrapPlayer"></div> <!-- needed element -->
+
+      <div class="inner">
+        <h1>Amrap Spa test</h1>
+        <h2 id="name"></h2>
+        Hello. (This is Page 1).<br>
+        Load <a id="ff" href="/program/5ft-high-rising">5ft High</a><br>
+        Go to <a id="hh" href="/program/headhunters">Headhunters</a>
+     </div>
+      <div id="amrapPage"></div> <!-- needed element -->
+        
+
+    <script scr="https://unpkg.com/jquery@3.3.1/dist/jquery.min.js"></script>
+
+    <script>
+
+       
+  window.addEventListener('DOMContentLoaded', (event) => {
+
+      document.getElementById('name').innerHTML = window.location.pathname;
+
+      document.getElementById('hh').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('name').innerHTML = e.target.pathname
+        history.pushState(e.target.pathname, null, e.target.href);
+        return false;
+      });
+
+      document.getElementById('ff').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('name').innerHTML = e.target.pathname
+        history.pushState(e.target.pathname, null, e.target.href);
+        return false;
+      });
+  
+      window.playerInfo = {
+        callSign: '3pbs', 
+        preferredName: 'PBS 106.7FM',
+        browserReplayUrlTemplate: 'http://media.emit.com/pbs/???PROGRAM???/???EPISODE???/aac_mid.m4a',
+        url: 'http://live-pbs2018.pantheonsite.io/program/5ft-high-rising',
+        browserLiveStreamUrl: 'http://eno.emit.com:8000/pbsfm_live_64.aacp'
+      }
+
+      window.station = { callSign: '3pbs', preferredName: 'PBS 106.7FM' };
+      window.stationCallSign = window.station.callSign;
+      window.widget = {
+        fields: [],
+        url: 'http://live-pbs2018.pantheonsite.io/program/5ft-high-rising',
+        urlArgs: [],
+        id: '1245',
+        code: {
+          customCss:
+            '</style>\n  <link rel="stylesheet" type="text/css" href="http://live-pbs2018.pantheonsite.io/sites/all/themes/custom/pbs/assets/css/amrap.style.css">\n<style>',
+          body: '<span id="iframeHelper"></span>',
+          server: 'http://airnet.org.au',
+          version: 'e53ec6776dd9',
+          airplaySearchUrl: 'http://www.airit.org.au/airplay-search.html',
+          defaultBannerImage1: null,
+          defaultBannerImage2: null,
+          defaultBannerImage3: null
+        },
+        isMobile: false,
+        isTablet: false,
+        isPhone: false
+      };
+      window.json = {
+        player: {
+          fm: {
+            guideId: 'fm',
+            guideName: 'PBS 106.7FM',
+            enableAudioEditor: true,
+            browserReplayUrlTemplate: 'http://media.emit.com/pbs/???PROGRAM???/???EPISODE???/aac_mid.m4a',
+            browserLiveStreamUrl: 'http://eno.emit.com:8000/pbsfm_live_64.aacp'
+          },
+          other1: {
+            guideId: 'other1',
+            guideName: 'test',
+            enableAudioEditor: true,
+            browserReplayUrlTemplate: 'http://media.emit.com/pbs-d/???PROGRAM???/???EPISODE???/aac_mid.m4a',
+            browserLiveStreamUrl: 'http://eno.emit.com:8000/pbsfm_live_64.aacp'
+          }
+        },
+        widget: {
+          fields: [],
+          url: 'http://live-pbs2018.pantheonsite.io/program/5ft-high-rising',
+          urlArgs: [],
+          id: '1245',
+          code: {
+            customCss:
+              '</style>\n  <link rel="stylesheet" type="text/css" href="http://live-pbs2018.pantheonsite.io/sites/all/themes/custom/pbs/assets/css/amrap.style.css">\n<style>',
+            body: '<span id="iframeHelper"></span>',
+            server: 'http://airnet.org.au',
+            version: 'e53ec6776dd9',
+            airplaySearchUrl: 'http://www.airit.org.au/airplay-search.html',
+            defaultBannerImage1: null,
+            defaultBannerImage2: null,
+            defaultBannerImage3: null
+          },
+          isMobile: false,
+          isTablet: false,
+          isPhone: false
+        },
+        station: { callSign: '3pbs', preferredName: 'PBS 106.7FM' },
+        domain: { name: 'live-pbs2018.pantheonsite.io', prefix: 'http://live-pbs2018.pantheonsite.io', css: '' }
+      };
+      window.showReactAudioPlayer = true;
+
+      
+       
+      });
+
+
+    
+    </script>
+    <script src="//airnet.org.au/react-audio-player/lib/hls.light.min.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,369 @@
+$font-size-small: 14px;
+$font-size-large: 22px;
+$row-height: 45px;
+$top-bar-height: $row-height;
+$gutter-width: 15px;
+$canvas-sidebar-width: 60px;
+$left-side-menu-width: 190px;
+
+// Colors
+$color-menu-background: darken(#538295, 25%);
+$color-top-bar: lighten(#253b43, 40%);
+$color-sidebar: darken(#66757f, 25%);
+$color-twitter: #55acee;
+$color-facebook: #3b5998;
+$color-instagram: #f75050;
+$color-linkedin: #0077b5;
+$color-pinterest: #cc2127;
+
+/* Breakpoints
+...................................................................................... */
+
+$font-face {
+  font-family: 'Flaticon';
+  src: url('../fonts/Flaticon.eot?56211168');
+  src: url('../fonts/Flaticon.eot?56211168#iefix') format('embedded-opentype'),
+    url('../fonts/Flaticon.woff2?56211168') format('woff2'), url('../fonts/Flaticon.woff?56211168') format('woff'),
+    url('../fonts/Flaticon.ttf?56211168') format('truetype'),
+    url('../fonts/Flaticon.svg?56211168#fontello') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  $font-face {
+    font-family: 'fontello';
+    src: url('../font/fontello.svg?56211168#fontello') format('svg');
+  }
+}
+*/
+
+[class^="flaticon"]:before,
+[class*=" flaticon"]:before {
+  font-family: "fontello";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+
+  display: inline-block;
+  text-decoration: inherit;
+  text-align: center;
+  /* opacity: @include 8; */
+
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.icon.flaticon-pause:before {
+  content: '\e800';
+} /* '' */
+.icon.flaticon-error:before {
+  content: '\f100';
+} /* '' */
+.icon.flaticon-skip-backwards:before {
+  content: '\f101';
+} /* '' */
+.icon.flaticon-skip-forward:before {
+  content: '\f102';
+} /* '' */
+.icon.flaticon-seek-backwards:before {
+  content: '\f103';
+} /* '' */
+.icon.flaticon-play:before {
+  content: '\f104';
+} /* '' */
+.icon.flaticon-seek-forward:before {
+  content: '\f105';
+} /* '' */
+
+$font-face {
+  font-family: "Inconsolata";
+  src: url("../fonts/Inconsolata-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  $font-face {
+    font-family: "Flaticon";
+    src: url("../fonts/Flaticon.svg#Flaticon") format("svg");
+  }
+}
+
+[class^="flaticon-"]:before,
+[class*=" flaticon-"]:before,
+[class^="flaticon-"]:after,
+[class*=" flaticon-"]:after {
+  font-family: Flaticon;
+  font-style: normal;
+}
+
+.flaticon-play:before {
+  content: "\f104";
+}
+.flaticon-pause:before {
+  content: "\f100";
+}
+.flaticon-skip-forward:before {
+  content: "\f102";
+}
+.flaticon-skip-backward:before {
+  content: "\f101";
+}
+.flaticon-seek-forward:before {
+  content: "\f105";
+}
+.flaticon-seek-backward:before {
+  content: "\f103";
+}
+
+/* Helpers
+...................................................................................... */
+
+@mixin placeholderColor($color) {
+  &::-webkit-input-placeholder {
+    color: $color;
+  }
+  &:-moz-placeholder {
+    color: $color;
+  }
+  &::-moz-placeholder {
+    color: $color;
+  }
+  &:-ms-input-placeholder {
+    color: $color;
+  }
+}
+
+@mixin roundCornerAll($radius) {
+  @include roundCorner($radius, $radius, $radius, $radius);
+}
+
+@mixin roundCorner($top, $right, $bottom, $left) {
+  -moz-border-radius: $top $right $bottom $left;
+  -webkit-border-radius: $top $right $bottom $left;
+  -khtml-border-radius: $top $right $bottom $left;
+  border-radius: $top $right $bottom $left;
+}
+
+@mixin opacity($value) {
+  -moz-opacity: $value; // Firefox
+  -khtml-opacity: $value; // Safari 1.x
+  opacity: $value;
+}
+
+@mixin transform($value, $origin:center) {
+  -webkit-transform: $value;
+  -moz-transform: $value;
+  -ms-transform: $value;
+  -o-transform: $value;
+  transform: $value;
+
+  -webkit-transform-origin: $origin;
+  -moz-transform-origin: $origin;
+  -ms-transform-origin: $origin;
+  -o-transform-origin: $origin;
+  transform-origin: $origin;
+}
+
+@mixin backgroundHover($backgroundColor, $percentage:5%) {
+  background: $backgroundColor;
+
+  &:hover {
+    background: darken($backgroundColor, $percentage);
+  }
+}
+
+@mixin backgroundClick($backgroundColor, $percentage:10%) {
+  background: $backgroundColor;
+
+  &:active {
+    background: darken($backgroundColor, $percentage);
+  }
+}
+
+@mixin foregroundHover($foregroundColor, $percentage:5%) {
+  color: $foregroundColor;
+
+  &:hover {
+    color: darken($foregroundColor, $percentage);
+  }
+}
+
+@mixin foregroundClick($foregroundColor, $percentage:10%) {
+  color: $foregroundColor;
+
+  &:active {
+    color: darken($foregroundColor, $percentage);
+  }
+}
+
+@mixin fullTransition($timer) {
+  -webkit-transition: all $timer ease;
+  -moz-transition: all $timer ease;
+  -ms-transition: all $timer ease;
+  -o-transition: all $timer ease;
+  transition: all $timer ease;
+}
+
+@mixin selectTransition($values...) {
+  -webkit-transition: $values;
+  -moz-transition: $values;
+  -ms-transition: $values;
+  -o-transition: $values;
+  transition: $values;
+}
+
+@mixin hoverTransition($timer) {
+  @include fullTransition($timer);
+
+  &:active,
+  &:hover {
+    @include noTransition();
+  }
+}
+
+@mixin selectHoverTransition($transition) {
+  @include selectTransition($transition);
+
+  &:active,
+  &:hover {
+    @include noTransition();
+  }
+}
+
+@mixin noTransition() {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+
+@mixin animationDelay($delay) {
+  -webkit-animation-delay: $delay;
+  -moz-animation-delay: $delay;
+  -o-animation-delay: $delay;
+  animation-delay: $delay;
+}
+
+@mixin unselectable() {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// Used to undo the $unselectable mixin
+@mixin selectable() {
+  -webkit-touch-callout: default;
+  -webkit-user-select: auto;
+  -khtml-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
+}
+
+@mixin removeInputGlow() {
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
+}
+
+@mixin grabbable() {
+  cursor: move; // Fallback incase grab isn't supported
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+
+  &:active,
+  &.active {
+    // Make the cursor actually "grab" on click - The :active psuedoselector is sometimes screwed in firefox, just apply a class using js to active this
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+  }
+}
+
+@-webkit-keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.loader-outer {
+  position: absolute;
+  display: none;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background: inherit;
+  z-index: 1;
+
+  &.active {
+    display: flex;
+  }
+
+  .loader {
+    font-size: 10px;
+    position: relative;
+    box-sizing: border-box;
+    text-indent: 9999em;
+    border: 2px solid rgba(120, 120, 120, 0.2);
+    border-left: 2px solid #999;
+    transform: translateZ(0);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    -webkit-animation: load8 0.7s infinite linear;
+    animation: load8 0.7s infinite linear;
+  }
+
+  .small {
+    width: 16px;
+    height: 16px;
+  }
+
+  .inverted {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-left-color: #eee;
+  }
+}

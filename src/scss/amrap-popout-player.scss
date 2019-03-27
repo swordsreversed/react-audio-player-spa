@@ -1,0 +1,289 @@
+@import 'mixins';
+
+$share-segment-color: #fc9d9a;
+$share-moment-color: #555;
+
+.amrap-player-outer {
+  display: flex;
+  align-items: stretch;
+  background: #000;
+  height: 62px;
+  color: #fff;
+  width: 100%;
+  z-index: 1000;
+  font-family: 'Open Sans';
+  font-weight: 200;
+
+  .left-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    background: #f5f5f5;
+
+    .upper {
+      display: flex;
+    }
+
+    .lower {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      margin-top: 10px;
+
+      .share-button {
+        padding: 2px 5px;
+        cursor: pointer;
+        color: #fff;
+        @include backgroundHover($share-segment-color);
+        @include backgroundClick($share-segment-color);
+      }
+    }
+  }
+
+  .left-buttons {
+    flex-shrink: 0;
+    position: relative;
+    padding-left: 15px;
+    padding-right: 15px;
+
+    .upper {
+      justify-content: center;
+      align-items: center;
+    }
+
+    &.loading {
+      .button.pause,
+      .button.play {
+        visibility: hidden;
+      }
+
+      .button.loading {
+        display: flex;
+      }
+    }
+
+    .button {
+      cursor: pointer;
+      font-size: 28px;
+      line-height: 1;
+      color: $share-moment-color;
+      @include transform(scale(1));
+      @include fullTransition(0.1s);
+
+      &.disabled {
+        color: #ccc;
+        pointer-events: none;
+      }
+
+      &.loading {
+        position: absolute;
+        display: none;
+        width: 35px;
+        height: 35px;
+        left: 96px;
+
+        .loader-outer .loader {
+          width: 35px;
+          height: 35px;
+          border-width: 3px;
+          border-color: lighten($share-segment-color, 10%);
+          border-left-color: darken($share-segment-color, 8%);
+        }
+      }
+
+      &.seek-right {
+        margin-right: 10px;
+        font-size: 30px;
+      }
+
+      &.seek-left {
+        margin-left: 10px;
+        font-size: 30px;
+      }
+
+      &:hover {
+        color: darken($share-moment-color, 10%);
+        @include transform(scale(1));
+      }
+
+      &:active {
+        color: darken($share-moment-color, 15%);
+        @include noTransition();
+        @include transform(scale(0.9));
+      }
+
+      .flaticon-play,
+      .flaticon-pause,
+      .flaticon-error {
+        font-size: 40px;
+        margin: 0 10px;
+        text-align: center;
+        width: auto;
+        @include foregroundHover($share-segment-color);
+        @include foregroundClick($share-segment-color);
+
+        &.flaticon-error {
+          color: #c02942;
+        }
+      }
+    }
+  }
+
+  .track-status {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+    padding: 10px 15px;
+    background: #777;
+
+    .mid {
+      color: $share-moment-color;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+
+      .left {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        color: #fff;
+
+        .artist {
+          color: #eee;
+          line-height: 1;
+          min-height: 12px;
+          margin-right: 5px;
+          font-weight: 400;
+
+          &:empty {
+            margin: 0;
+          }
+        }
+
+        .show-name {
+          margin-left: 10px;
+          color: #ccc;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      } // .left
+
+      .right {
+        display: flex;
+
+        .switch-type {
+          font-weight: 400;
+          cursor: pointer;
+          @include foregroundHover(#A7DBD8);
+          @include foregroundClick(#A7DBD8);
+        }
+      }
+    } // .mid
+
+    .lower {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .precise-clock,
+      .track-time {
+        font-size: 15px;
+
+        &:empty {
+          margin: 0;
+        }
+      }
+
+      .precise-clock {
+        margin-right: 15px;
+        font-family: 'Inconsolata', monospace;
+      }
+
+      .track-time {
+        margin-left: 15px;
+        font-family: 'Inconsolata', monospace;
+      }
+
+      .bar {
+        background: #fff;
+        flex-grow: 1;
+        position: relative;
+        cursor: pointer;
+        height: 15px;
+        margin: 5px 0 5px -2px;
+        @include selectTransition(width 0.2s ease);
+
+        .bar-segment {
+          position: absolute;
+          top: 0;
+          height: 100%;
+          width: 2px;
+          background: #888;
+          pointer-events: none;
+
+          &.playing {
+            background: $share-segment-color;
+          }
+        }
+
+        .bar-popup {
+          position: absolute;
+          top: -32px;
+          width: 80px;
+          height: 30px;
+          background: $share-moment-color;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          @include roundCornerAll(5px);
+
+          &:after {
+            top: 100%;
+            left: 50%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+            border-color: rgba(85, 85, 85, 0);
+            border-top-color: $share-moment-color;
+            border-width: 6px;
+            margin-left: -6px;
+          }
+        }
+
+        .bar-background {
+          height: 100%;
+          width: 0;
+          position: absolute;
+          background: #ccc;
+        }
+      } // .bar
+    } // .lower
+  } // .track-status
+
+  &.mobile {
+    .left-buttons {
+      padding: 0 5px 0 10px;
+
+      .button .fa-play,
+      .button .fa-pause {
+        margin: 0 9px;
+      }
+
+      .button.loading {
+        left: 38px;
+      }
+    }
+  }
+}

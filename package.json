@@ -1,0 +1,40 @@
+{
+  "name": "react-audio-player",
+  "version": "2.0.0",
+  "description": "HTML5 audio player using React.js",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel ./src/index.html --log-level 3",
+    "build": "parcel build ./src/index.html"
+  },
+  "author": "Nic Barker",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime-corejs2": "^7.4.2",
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
+    "dayjs": "^1.8.11",
+    "lodash": "^4.17.11",
+    "lodash.findindex": "^4.6.0",
+    "lodash.pickby": "^4.6.0",
+    "moment": "^2.24.0",
+    "preact": "^8.4.2",
+    "react": "^16.3.0",
+    "react-dayjs": "^0.1.4",
+    "react-dom": "^16.3.0",
+    "react-moment": "^0.8.4",
+    "request": "^2.34",
+    "request-promise": "^4.2.4",
+    "url-pattern": "^1.0.3",
+    "uuid": "^3.3.2",
+    "whatwg-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/plugin-transform-runtime": "^7.4.0",
+    "autoprefixer": "^9.5.0",
+    "parcel-bundler": "^1.12.3",
+    "sass": "^1.17.3",
+    "semistandard": "^13.0.1"
+  }
+}

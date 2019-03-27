@@ -1,0 +1,297 @@
+import React, { Component, Fragment } from 'react';
+import rp from 'request-promise';
+import UrlPattern from 'url-pattern';
+import dayjs from 'dayjs';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import MiniPlayerSpa from './MiniPlayerSpa';
+import '../scss/amrapPage.scss';
+import AmrapContext from './contextProvider';
+
+var popStateEvent = new PopStateEvent('popstate', { state: history });
+dispatchEvent(popStateEvent);
+
+class Program extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      program: {},
+      episodeList: [],
+      currentEpisode: {},
+      playlist: null,
+      audioState: 'stopped', // playing | stopped | paused | loading
+      path: window.location.pathname,
+      tabValue: 0,
+      loadingPlaylist: false
+    };
+    this.getApi = this.getApi.bind(this);
+    this.handleTabChange = this.handleTabChange.bind(this);
+
+    window.addEventListener('popstate', function (p) {
+      console.log('====================================');
+      console.log(p.state);
+      console.log('====================================');
+    });
+    // let hstate = window.location.pathname;
+    // history.pushState(hstate, '', window.location.href);
+    let self = this;
+    // eslint-disable-next-line no-undef
+    var realPushState = history.pushState;
+    // eslint-disable-next-line no-undef
+    history.pushState = function (arg1, arg2, arg3) {
+      console.log('====================================');
+      console.log('histroy', arg1);
+      console.log('====================================');
+      self.setState({
+        path: arg1
+      });
+      // self.forceUpdate();
+
+      // eslint-disable-next-line no-undef
+      return realPushState.apply(history, [
+        null,
+        null,
+        arg1
+      ]);
+    };
+  }
+
+  async componentDidMount () {
+    let { audioFile, callSign } = this.props;
+
+    // TODO fix click second button
+    // TODO sharedstate for toplaer (eg on stop - doesnt update button)
+    // TODO playlists?
+    // TODO fix window vars in index
+    // TODO fix time in popout player - handleupdate
+    // TODO general cleanup
+    if (callSign) {
+      const pattern = new UrlPattern('/program(/:name)(/:episode)(/:track)');
+      let urlPaths = pattern.match(window.location.pathname);
+      if (urlPaths.name) {
+        let program = await this.getApi(
+          `http://staging.airnet.org.au/rest/stations/${callSign}/programs/${urlPaths.name}`
+        );
+        let episodes = await this.getApi(
+          `http://staging.airnet.org.au/rest/stations/${callSign}/programs/${urlPaths.name}/episodes`
+        );
+        let episodeList = episodes.slice(0, 10);
+        let curEp = episodes.filter((ep) => ep.currentEpisode);
+        let episode = await this.getApi(curEp[0].episodeRestUrl);
+        let playlist = await this.getApi(episode.playlistRestUrl);
+
+        audioFile = audioFile.replace('???PROGRAM???', urlPaths.name);
+        audioFile = audioFile.replace('???EPISODE???', dayjs(episode.start).format('YYYYMMDDHHss'));
+        // http://media.emit.com/pbs/5ft-high-rising/201901190600/aac_mid.m4a
+        episodeList.forEach((episode) => {
+          episode.dateLabel = dayjs(episode.start).format("ddd DD MMM 'YY");
+        });
+
+        playlist.forEach((track) => {
+          track.url = audioFile;
+        });
+
+        this.setState({
+          thisPage: window.location.href,
+          program: program,
+          episodeList: episodeList,
+          currentEpisode: curEp[0],
+          playlist: playlist,
+          tabValue: episodeList.length - 1
+        });
+      }
+    }
+  }
+
+  async componentDidUpdate (prevProps, prevState) {
+    let { audioFile, callSign } = this.props;
+
+    if (prevState.path !== this.state.path) {
+      let paths = this.state.path.split('/');
+      let programName = paths[2];
+      let program = await this.getApi(`http://staging.airnet.org.au/rest/stations/${callSign}/programs/${programName}`);
+      let episodeList = await this.getApi(
+        `http://staging.airnet.org.au/rest/stations/3pbs/programs/${programName}/episodes`
+      );
+      let curEp = episodeList.filter((ep) => ep.currentEpisode);
+      let episode = await this.getApi(curEp[0].episodeRestUrl);
+      let playlist = await this.getApi(episode.playlistRestUrl);
+
+      audioFile = audioFile.replace('???PROGRAM???', programName);
+      audioFile = audioFile.replace('???EPISODE???', dayjs(episode.start).format('YYYYMMDDHHss'));
+      // http://media.emit.com/pbs/5ft-high-rising/201901190600/aac_mid.m4a
+      episodeList.forEach((episode) => {
+        episode.dateLabel = dayjs(episode.start).format("ddd DD MMM 'YY");
+      });
+
+      playlist.forEach((track) => {
+        track.url = audioFile;
+      });
+
+      this.setState({
+        thisPage: window.location.href,
+        program: program,
+        episodeList: episodeList,
+        currentEpisode: curEp[0],
+        playlist: playlist,
+        tabValue: episodeList.length - 1
+      });
+    }
+
+    // change playlist
+    if (prevState.currentEpisode.start !== this.state.currentEpisode.start) {
+      this.setState({
+        loadingPlaylist: true
+      });
+      let episode = await this.getApi(this.state.currentEpisode.episodeRestUrl);
+      let playlist = await this.getApi(episode.playlistRestUrl);
+      playlist.forEach((track) => {
+        track.url = audioFile;
+      });
+
+      audioFile = audioFile.replace('???PROGRAM???', this.state.program.name);
+      audioFile = audioFile.replace('???EPISODE???', dayjs(this.state.currentEpisode.start).format('YYYYMMDDHHss'));
+
+      this.setState({
+        playlist: playlist,
+        loadingPlaylist: false
+      });
+    }
+  }
+
+  async getApi (url, path) {
+    const response = await rp(url);
+    return JSON.parse(response);
+  }
+
+  handleTabChange (event, value) {
+    this.setState({ tabValue: value });
+  }
+
+  loadEpisode (episode) {
+    this.setState({
+      currentEpisode: episode
+    });
+  }
+
+  render () {
+    let { currentEpisode, program, episodeList, playlist, thisPage, tabValue, loadingPlaylist } = this.state;
+
+    return (
+      <Fragment>
+        {episodeList.length > 0 && (
+          <div>
+            <Tabs
+              style={{ overflow: 'hidden' }}
+              value={tabValue}
+              onChange={this.handleTabChange}
+              variant='scrollable'
+              scrollButtons='on'
+            >
+              {episodeList.map((episode, i) => (
+                <Tab
+                  key={i}
+                  classes={{ selected: 'selected-tab' }}
+                  label={episode.dateLabel}
+                  onClick={() => this.loadEpisode(episode)}
+                />
+              ))}
+            </Tabs>
+            <div className='playlistContainer'>
+              <h1>{currentEpisode.title}</h1>
+              {loadingPlaylist && <h4>Loading...</h4>}
+              {!loadingPlaylist && (
+                <Table className='playlistInner'>
+                  {playlist.map((track, i) => <TrackView track={track} key={i} />)}
+                </Table>
+              )}
+            </div>
+          </div>
+        )}
+      </Fragment>
+    );
+  }
+}
+
+// description: null
+// duration: 10800
+// end: "2018-11-10 09:00:00"
+// episodeRestUrl: "http://staging.airnet.org.au/rest/stations/3pbs/programs/5ft-high-rising/episodes/2018-11-10+06%3A00%3A00"
+// imageUrl: null
+// multipleEpsOnDay: false
+// smallImageUrl: null
+// start: "2018-11-10 06:00:00"
+// title: "Peace in the valley - with Ben Leece live in the studio"
+// url: null
+
+// const EpisodeListView = ({ episodeList, program }) => (
+//   <ul className='overview episode-tabs'>
+//     {episodeList.map((episode, i) => <EpisodeView episode={episode} program={program} key={i} />)}
+//   </ul>
+// );
+
+// <li
+//       className='episode'
+//       data-episode-id=''
+//       data-episode-start={episode.start}
+//       data-episode-url='http://live-pbs2018.pantheonsite.io/program/5ft-high-rising/2018-11-10'
+//       data-needs-time='false'
+//     >
+//       <div className='month firstEpOfMonth'>{dateMnth}</div>
+//       <a href='http://live-pbs2018.pantheonsite.io/program/5ft-high-rising/2018-11-10' className='changeEpisode'>
+//         <div className='episodeDay inactiveButton'>{dateWeek}</div>
+//       </a>
+//     </li>
+// approximateTime: "2019-01-19 06:00:00"
+// artist: "Raconteurs"
+// contentDescriptors: {isAustralian: false, isLocal: null, isFemale: false, isIndigenous: null, isNew: null}
+// id: 5658857
+// image: "https://i.ytimg.com/vi/ZzgaOVWbZiU/hqdefault.jpg"
+// notes: null
+// release: null
+// time: "06:00:00"
+// title: "Carolina Drama"
+// track: "Carolina Drama"
+// twitterHandle: null
+// type: "track"
+// url: null
+// video: "http://www.youtube.com/embed/ZzgaOVWbZiU"
+// wikipedia: "The Raconteurs"
+
+const TrackView = (props) => {
+  let { track } = props;
+
+  return (
+    <TableBody>
+      <TableRow
+        id={`playlist-${track.id}`}
+        data-timecode={track.approximateTime}
+        data-title={track.title}
+        data-artist={track.artist}
+      >
+        <TableCell style={{ display: 'none' }}>{track.id}</TableCell>
+        <TableCell>{track.time}</TableCell>
+        <TableCell>
+          {track.artist} - {track.title}
+        </TableCell>
+        <TableCell data-time={track.time}>
+          <div className='mini-player'>
+            <MiniPlayerSpa track={track} />
+          </div>
+        </TableCell>
+        <TableCell className='trackContent'>
+          <a href='' rel='nofollow'>
+            info
+          </a>
+        </TableCell>
+      </TableRow>
+    </TableBody>
+  );
+};
+
+export default Program;
+Program.contextType = AmrapContext;
