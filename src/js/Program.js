@@ -12,8 +12,8 @@ import MiniPlayerSpa from './MiniPlayerSpa';
 import '../scss/amrapPage.scss';
 import AmrapContext from './contextProvider';
 
-var popStateEvent = new PopStateEvent('popstate', { state: history });
-dispatchEvent(popStateEvent);
+// var popStateEvent = new PopStateEvent('popstate', { state: history });
+// dispatchEvent(popStateEvent);
 
 class Program extends Component {
   constructor (props) {
@@ -31,11 +31,8 @@ class Program extends Component {
     this.getApi = this.getApi.bind(this);
     this.handleTabChange = this.handleTabChange.bind(this);
 
-    window.addEventListener('popstate', function (p) {
-      console.log('====================================');
-      console.log(p.state);
-      console.log('====================================');
-    });
+    // window.addEventListener('popstate', function (p) {
+    // });
     // let hstate = window.location.pathname;
     // history.pushState(hstate, '', window.location.href);
     let self = this;
@@ -43,9 +40,6 @@ class Program extends Component {
     var realPushState = history.pushState;
     // eslint-disable-next-line no-undef
     history.pushState = function (arg1, arg2, arg3) {
-      console.log('====================================');
-      console.log('histroy', arg1);
-      console.log('====================================');
       self.setState({
         path: arg1
       });
@@ -179,7 +173,7 @@ class Program extends Component {
   }
 
   render () {
-    let { currentEpisode, program, episodeList, playlist, thisPage, tabValue, loadingPlaylist } = this.state;
+    let { currentEpisode, episodeList, playlist, tabValue, loadingPlaylist } = this.state;
 
     return (
       <Fragment>
@@ -216,51 +210,6 @@ class Program extends Component {
     );
   }
 }
-
-// description: null
-// duration: 10800
-// end: "2018-11-10 09:00:00"
-// episodeRestUrl: "http://staging.airnet.org.au/rest/stations/3pbs/programs/5ft-high-rising/episodes/2018-11-10+06%3A00%3A00"
-// imageUrl: null
-// multipleEpsOnDay: false
-// smallImageUrl: null
-// start: "2018-11-10 06:00:00"
-// title: "Peace in the valley - with Ben Leece live in the studio"
-// url: null
-
-// const EpisodeListView = ({ episodeList, program }) => (
-//   <ul className='overview episode-tabs'>
-//     {episodeList.map((episode, i) => <EpisodeView episode={episode} program={program} key={i} />)}
-//   </ul>
-// );
-
-// <li
-//       className='episode'
-//       data-episode-id=''
-//       data-episode-start={episode.start}
-//       data-episode-url='http://live-pbs2018.pantheonsite.io/program/5ft-high-rising/2018-11-10'
-//       data-needs-time='false'
-//     >
-//       <div className='month firstEpOfMonth'>{dateMnth}</div>
-//       <a href='http://live-pbs2018.pantheonsite.io/program/5ft-high-rising/2018-11-10' className='changeEpisode'>
-//         <div className='episodeDay inactiveButton'>{dateWeek}</div>
-//       </a>
-//     </li>
-// approximateTime: "2019-01-19 06:00:00"
-// artist: "Raconteurs"
-// contentDescriptors: {isAustralian: false, isLocal: null, isFemale: false, isIndigenous: null, isNew: null}
-// id: 5658857
-// image: "https://i.ytimg.com/vi/ZzgaOVWbZiU/hqdefault.jpg"
-// notes: null
-// release: null
-// time: "06:00:00"
-// title: "Carolina Drama"
-// track: "Carolina Drama"
-// twitterHandle: null
-// type: "track"
-// url: null
-// video: "http://www.youtube.com/embed/ZzgaOVWbZiU"
-// wikipedia: "The Raconteurs"
 
 const TrackView = (props) => {
   let { track } = props;

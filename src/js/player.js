@@ -191,8 +191,7 @@ class Player {
       }
 
       // TODO change this!
-      currentTrack.audio.volume = 0.1;
-      // currentTrack.audio.volume = volume;
+      currentTrack.audio.volume = volume;
       audioState = 'loading';
 
       // Bind events to current audio
@@ -422,9 +421,6 @@ class Player {
 
   // Seek to seconds through a track
   seekSeconds (seconds) {
-    console.log('====================================');
-    console.log('seek', seconds);
-    console.log('====================================');
     if (currentTrack.audio) {
       this.setTimeCode(seconds);
 

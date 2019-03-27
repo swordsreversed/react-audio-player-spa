@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "parcel ./src/index.html --log-level 3",
-    "build": "parcel build ./src/index.html"
+    "build": "parcel build ./src/js/index.js --out-file react-audio.js"
   },
   "author": "Nic Barker",
   "license": "ISC",

@@ -5,12 +5,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import dayjs from 'dayjs';
-// import css from '../scss/amrap-popout-player.scss';
 import { unescape } from 'lodash';
 import Player from './player';
 import AmrapContext from './contextProvider';
-
-// import bridgePlayer from './player-wrapper.js';
 const bridgePlayer = new Player();
 
 export default class PlayerView extends React.Component {
@@ -20,7 +17,7 @@ export default class PlayerView extends React.Component {
     this.state = {
       trackId: null,
       trackUrl: null,
-      audioState: 'stopped', // playing | stopped | paused | loading
+      audioState: 'stopped',
       currentAudio: null,
       currentPlaylist: {},
       trackTime: 0,
@@ -549,13 +546,6 @@ export default class PlayerView extends React.Component {
             </div>
           </div>
         </div>
-        <AmrapContext.Consumer>
-          {(sharedState) => (
-            <div>
-              <h1>{sharedState.play}</h1>
-            </div>
-          )}
-        </AmrapContext.Consumer>
       </div>
     );
   }
