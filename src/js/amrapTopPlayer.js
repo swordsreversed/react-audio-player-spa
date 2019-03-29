@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { unescape } from 'lodash';
 import Player from './player';
 import AmrapContext from './contextProvider';
+import { format } from 'path';
 const bridgePlayer = new Player();
 
 export default class PlayerView extends React.Component {
@@ -59,6 +60,14 @@ export default class PlayerView extends React.Component {
     });
 
     bridgePlayer.setCurrentTrack(data.id, data.url, data.title, data.artist, 'type', data.timeCode);
+    // bridgePlayer.setCurrentTrack(
+    //   this.state.trackId,
+    //   this.state.trackUrl,
+    //   this.state.trackTitle,
+    //   this.state.trackArtist,
+    //   'type',
+    //   this.state.timeCode
+    // );
   }
 
   handleChangeTrackTimeCode (data) {
@@ -121,14 +130,18 @@ export default class PlayerView extends React.Component {
   }
 
   handleTimeUpdate (playerInfo) {
+    let ctup = dayjs(playerInfo.data.clockTime)
+      .add(Math.floor(playerInfo.data.audio.currentTime), 'seconds')
+      .format('hh:mm:ss a');
     this.setState({
-      trackTime: playerInfo.data.audio.currentTime
-        ? Math.floor(playerInfo.data.audio.currentTime)
-        : this.state.trackTime,
+      // trackTime: playerInfo.data.audio.currentTime
+      //   ? Math.floor(playerInfo.data.audio.currentTime)
+      //   : this.state.trackTime,
+      trackTime: playerInfo.data.audio.currentTime,
       trackLength: playerInfo.data.audio.duration || this.state.trackLength,
       trackTitle: unescape(playerInfo.data.title),
       trackArtist: playerInfo.data.artist,
-      clockTime: playerInfo.data.clockTime
+      clockTime: ctup
     });
   }
 
@@ -256,16 +269,10 @@ export default class PlayerView extends React.Component {
     document.body.addEventListener('update', (e) => {
       switch (e.detail.event) {
         case 'handleLoading':
-          console.log('====================================');
-          console.log('handleloading from player');
-          console.log('====================================');
           this.handleLoading(e.detail);
           break;
 
         case 'handlePlay':
-          console.log('====================================');
-          console.log('handlePlay from player', e.detail);
-          console.log('====================================');
           this.handlePlay(e.detail);
           break;
 
@@ -295,8 +302,9 @@ export default class PlayerView extends React.Component {
       } else if (this.context.play === 'stopped' || this.context.play === 'paused') {
         if (prevState.audioState !== this.context.play) {
           // movethis into function?
+
           this.setState({
-            audioState: this.context.play
+            audioState: 'paused'
           });
           // this.context.updatePlayer('paused');
           this.pauseClicked();
@@ -326,6 +334,7 @@ export default class PlayerView extends React.Component {
           this.playClickedMini(this.context.currentTrack.timeCode);
         }
       }
+    } else if (this.context.currentTrack.title && this.context.currentTrack.title !== this.state.trackTitle) {
     }
   }
 
@@ -348,7 +357,13 @@ export default class PlayerView extends React.Component {
       );
     } else if (this.state.audioState === 'playing' || this.state.audioState === 'loading') {
       playButton = (
-        <div className='button pause' onClick={this.pauseClicked.bind(this)}>
+        <div
+          className='button pause'
+          onClick={() => {
+            this.context.updatePlayer('paused');
+            // this.pauseClicked.bind(this);
+          }}
+        >
           <i className='icon flaticon-pause' />
         </div>
       );
@@ -376,12 +391,26 @@ export default class PlayerView extends React.Component {
       trackTime = 'Live Radio';
     } else if (bridgePlayer.getCurrentTrack().type === 'stream') {
       trackTime = dayjs().format('hh:mm:ss a');
-    } else if (this.state.clockTime) {
-      trackTime = this.state.clockTime;
-      endTime = dayjs(bridgePlayer.getPlaylist().clockTime).add(trackLength, 'seconds').format('hh:mm:ss a');
+      // } else if (this.state.clockTime) {
+      //   // trackTime = this.state.clockTime;
+      //   // endTime = dayjs(bridgePlayer.getPlaylist().clockTime).add(trackLength, 'seconds').format('hh:mm:ss a');
+      //   // trackTime = dayjs(bridgePlayer.getCurrentTrack().timeCode).format('hh:mm:ss a');
+      //   // trackTime = dayjs(bridgePlayer.getCurrentTrack().timeCode).format('hh:mm:ss a');
+      //   // endTime = dayjs(bridgePlayer.getCurrentTrack().timeCode).add(trackLength, 'seconds').format('hh:mm:ss a');
+
+      //   trackTime = dayjs(bridgePlayer.getCurrentTrack().timeCode, format('hh:mm:ss')).format('hh:mm:ss a');
+      //   // endTime = dayjs(bridgePlayer.getCurrentTrack().timeCode, format('hh:mm:ss'))
+      //   // .add(trackLength, 'seconds')
+      //   // .format('hh:mm:ss a');
     } else if (bridgePlayer.getCurrentTrack().timeCode || bridgePlayer.getCurrentTrack().timeCode === 0) {
-      trackTime = dayjs(bridgePlayer.getPlaylist().clockTime).format('hh:mm:ss a');
-      endTime = dayjs(bridgePlayer.getPlaylist().clockTime).add(trackLength, 'seconds').format('hh:mm:ss a');
+      // if (bridgePlayer.getPlaylist().clockTime) {
+      // trackTime = dayjs(bridgePlayer.getPlaylist().clockTime).format('hh:mm:ss a');
+      // endTime = dayjs(bridgePlayer.getPlaylist().clockTime).add(trackLength, 'seconds').format('hh:mm:ss a');
+      // } else {
+      // trackTime = dayjs(bridgePlayer.getCurrentTrack().timeCode).format('hh:mm:ss a');
+      trackTime = dayjs(`01/01/70 ${bridgePlayer.getCurrentTrack().timeCode}`, 'hh:mm:ss').format('h:mm:ss a');
+      // trackTime = bridgePlayer.getCurrentTrack().timeCode;
+      // endTime = dayjs(bridgePlayer.getCurrentTrack().timeCode).add(trackLength, 'seconds').format('hh:mm:ss a');
     } else {
       let minutes = Math.floor(this.state.trackTime / 60);
       let secs = Math.floor(this.state.trackTime % 60);
@@ -521,7 +550,9 @@ export default class PlayerView extends React.Component {
               <div className='right'>{switchType}</div>
             </div>
             <div className='lower'>
-              <div className='precise-clock'>{trackTime}</div>
+              <div className='precise-clock' style={{ background: 'pink' }}>
+                {trackTime}
+              </div>
               <div
                 className='bar'
                 onClick={this.barClick.bind(this)}

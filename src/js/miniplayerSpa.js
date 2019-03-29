@@ -12,40 +12,38 @@ export default class MiniPlayerSpa extends React.Component {
     super(props);
 
     this.state = {
-      self: false,
+      self: 0,
       audioState: this.props.loading ? 'loading' : 'stopped' // playing | stopped | paused | loading
     };
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (this.state.self) {
+    // if not the focused track should not be playing - do we need this?
+    if (this.state.self !== 0 && this.context.playingId !== this.state.self) {
+      if (this.state.audioState === 'playing') {
+        this.setState({
+          audioState: 'stopped'
+        });
+      }
+    }
+
+    // this is the focused track
+    if (this.state.self === this.context.playingId && this.state.self !== 0) {
       if (this.context.play === 'playing') {
         if (prevState.audioState !== this.context.play) {
-          this.setState({
-            audioState: 'playing'
-          });
+          this.setState({ audioState: 'playing' });
         }
       } else if (this.context.play === 'stopped' || this.context.play === 'paused') {
         if (prevState.audioState !== this.context.play) {
-          this.setState({
-            audioState: 'paused'
-          });
+          this.setState({ audioState: 'paused' });
         }
       } else if (this.context.play === 'loading') {
         if (prevState.audioState !== this.context.play) {
-          this.setState({
-            audioState: 'loading'
-          });
+          this.setState({ audioState: 'loading' });
         }
       }
     }
   }
-
-  // componentDidUpdate (prevProps, prevState) {
-  //   if (prevProps.loading && !this.props.loading) {
-  //     this.setState({ audioState: 'stopped' });
-  //   }
-  // }
 
   checkCurrentTrack (data) {
     if (data.id === this.props.id) {
@@ -111,24 +109,24 @@ export default class MiniPlayerSpa extends React.Component {
 
   playClicked () {
     let context = this.context;
+    context.updatePlayer('loading');
     let { track } = this.props;
     if (this.state.audioState === 'paused' || this.state.audioState === 'stopped') {
       this.setState({
-        self: 'true'
+        self: track.id
       });
-      console.log('====================================');
-      console.log('kick off OD');
-      console.log('====================================');
-
-      // this.setState({
-      //   audioState: context.play
-      // });
 
       if (context.currentTrack.url !== track.url) {
-        console.log('====================================');
-        console.log('differnt tracks!', context.currentTrack.url);
-        console.log('====================================');
-
+        context.setCurrentTrack({
+          id: track.id,
+          url: track.url.toLowerCase(),
+          title: track.title,
+          artist: track.artist,
+          type: track.type,
+          timeCode: track.time
+        });
+        context.updatePlayingId(track.id);
+      } else {
         context.setCurrentTrack({
           id: track.id,
           url: track.url,
@@ -137,73 +135,8 @@ export default class MiniPlayerSpa extends React.Component {
           type: track.type,
           timeCode: track.time
         });
+        context.updatePlayingId(track.id);
       }
-
-      //   approximateTime: "2019-01-19 06:00:00"
-      // artist: "Raconteurs"
-      // contentDescriptors: {isAustralian: false, isLocal: null, isFemale: false, isIndigenous: null, isNew: null}
-      // id: 5658857
-      // image: "https://i.ytimg.com/vi/ZzgaOVWbZiU/hqdefault.jpg"
-      // notes: null
-      // release: null
-      // time: "06:00:00"
-      // title: "Carolina Drama"
-      // track: "Carolina Drama"
-      // twitterHandle: null
-      // type: "track"
-      // url: null
-      // video: "http://www.youtube.com/embed/ZzgaOVWbZiU"
-      // wikipedia: "The Raconteurs"
-
-      // check sharedstate.play
-      // we shouldnt have play state unless click originated here
-      // if so shared.play should set stop
-
-      // If the current track is not even the same url as this one
-      // if (bridgePlayer.getCurrentTrack().url !== this.props.url) {
-      //   bridgePlayer.stopTrack();
-      //   bridgePlayer.setCurrentTrack(
-      //     this.props.id,
-      //     this.props.url,
-      //     this.props.title,
-      //     this.props.artist,
-      //     this.props.type,
-      //     this.props.timeCode
-      //   );
-      //   if (this.props.playlist) {
-      //     bridgePlayer.setPlaylist(this.props.playlist);
-      //   }
-      //   setTimeout(() => {
-      //     bridgePlayer.playTrack();
-      //     if (this.props.timeCode || this.props.timeCode === 0) {
-      //       bridgePlayer.setTimeCode(this.props.timeCode);
-      //     }
-      //   }, 50);
-      //   // Otherwise if it's the same url (i.e they're part of the same radio show), seek to this track
-      // } else if (bridgePlayer.getCurrentTrack().url === this.props.url) {
-      //   if (!bridgePlayer.getCurrentTrack().audio) {
-      //     bridgePlayer.setCurrentTrack(
-      //       this.props.id,
-      //       this.props.url,
-      //       this.props.title,
-      //       this.props.artist,
-      //       this.props.type,
-      //       this.props.timeCode
-      //     );
-      //     setTimeout(() => {
-      //       bridgePlayer.playTrack();
-      //       if (this.props.timeCode || this.props.timeCode === 0) {
-      //         bridgePlayer.setTimeCode(this.props.timeCode);
-      //       }
-      //     }, 50);
-      //   } else {
-      //     if (this.state.audioState === 'paused') {
-      //       bridgePlayer.playTrack(this.props.timeCode);
-      //     } else {
-      //       bridgePlayer.seekSeconds(this.props.timeCode);
-      //     }
-      //   }
-      // }
     } else if (this.state.audioState === 'playing') {
       this.setState({
         audioState: 'paused'

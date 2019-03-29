@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import player from './player';
 import { AmrapContextProvider } from './contextProvider';
-import AmrapPopoutPlayer from './amrap-popout-player';
+import AmrapTopPlayer from './amrapTopPlayer';
 import { AmrapPopoutPortal, AmrapMiniPortal } from './amrapPortal';
 import ErrorBoundary from './errorBoundary';
 import Program from './Program';
@@ -12,7 +12,7 @@ const NewApp = () => {
     <ErrorBoundary>
       <AmrapContextProvider>
         <AmrapPopoutPortal>
-          <AmrapPopoutPlayer liveUrls={window.liveUrls} hideShareButtons={'true'} />;
+          <AmrapTopPlayer liveUrls={window.liveUrls} hideShareButtons={'true'} />;
         </AmrapPopoutPortal>
 
         <AmrapMiniPortal>
@@ -24,13 +24,15 @@ const NewApp = () => {
 };
 
 function initPlayer () {
-  if (window.showReactAudioPlayer === true) {
-    ReactDOM.render(<NewApp />, document.getElementById('amrapRoot'));
-  }
+  ReactDOM.render(<NewApp />, document.getElementById('amrapRoot'));
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   if (window.json.player && Object.values(window.json.player).length > 0) {
+    console.log('====================================');
+    console.log(window.json.player.fm.browserReplayUrlTemplate);
+    console.log('====================================');
+
     window.liveUrls = Object.values(window.json.player);
   } else {
     window.liveUrls = [];

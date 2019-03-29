@@ -7,8 +7,12 @@ export class AmrapContextProvider extends React.Component {
     super(props);
     this.state = {
       play: 'stopped',
+      playingId: 0,
       updatePlayer: (play) => {
         this.setState({ play });
+      },
+      updatePlayingId: (playingId) => {
+        this.setState({ playingId });
       },
       currentTrack: {
         id: '',

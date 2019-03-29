@@ -87,7 +87,8 @@ class Player {
   setVolume (volumeInt) {
     volume = volumeInt;
     if (currentTrack.audio) {
-      currentTrack.audio.volume = volume;
+      // currentTrack.audio.volume = volume;
+      currentTrack.audio.volume = 0.2;
     }
   }
 
@@ -110,6 +111,10 @@ class Player {
   }
 
   setCurrentTrack (id, url, title, artist, type, timeCode) {
+    let rtc = timeCode ? this.toSeconds(timeCode) : null;
+    console.log('rtc', rtc);
+    console.log('tc', timeCode);
+
     currentTrack.id = id;
     currentTrack.url = url;
     currentTrack.title = title;
@@ -117,17 +122,15 @@ class Player {
     currentTrack.type = type;
     currentTrack.timeCode = timeCode;
     currentTrack.clockTime = playlist.clockTime
-      ? dayjs(timeCode).add(Math.floor(timeCode), 'seconds').format('hh:mm:ss a')
-      : null;
+      ? dayjs(playlist.clockTime).add(Math.floor(rtc), 'seconds').format('hh:mm:ss a')
+      : timeCode;
     audioState = 'stopped';
     this.currentTrack = currentTrack;
-    // this.sendEventToListeners('handleSetCurrentTrack');
   }
 
   clearCurrentTrack () {
     currentTrack = {};
     audioState = 'stopped';
-    // this.sendEventToListeners('handleSetCurrentTrack');
   }
 
   setTimeCode (seconds) {
@@ -261,10 +264,11 @@ class Player {
               currentTrack.clockTime = dayjs(playlist.clockTime)
                 .add(Math.floor(currentTrack.audio.currentTime), 'seconds')
                 .format('hh:mm:ss a');
+            } else {
+              currentTrack.clockTime = dayjs().format('hh:mm:ss a');
             }
           }
           this.emitUpdate('handleTimeUpdate');
-          // this.sendEventToListeners('handleTimeUpdate');
         }
       };
 

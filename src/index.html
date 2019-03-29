@@ -4,7 +4,7 @@
     <link rel='stylesheet'
       href='https://unpkg.com/normalize.css@7.0.0/normalize.css'/>
     <link rel='stylesheet'
-      href='http://airnet.org.au/react-audio-player/react-audio-player.min.e53ec6776dd9.css'/>
+      href='//airnet.org.au/react-audio-player/react-audio-player.min.e53ec6776dd9.css'/>
     <style>
 
       html {
@@ -38,8 +38,17 @@
         Load <a id="ff" href="/program/5ft-high-rising">5ft High</a><br>
         Go to <a id="hh" href="/program/headhunters">Headhunters</a>
      </div>
-    <div id="amrapPage"></div> <!-- needed element -->
-        
+        <div class="ds-section-main">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 col-sm-12 ">
+      
+  <div class="field-amrap-page">
+    <div id="amrapPage"></div>  </div>
+    </div>
+</div>
+</div>
+</div>
 
 
     <script>
@@ -87,7 +96,6 @@
         },
         station: { callSign: '3pbs', preferredName: 'PBS 106.7FM' }
       };
-      window.showReactAudioPlayer = true;
       
       });
     </script>

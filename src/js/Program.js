@@ -8,12 +8,9 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import MiniPlayerSpa from './MiniPlayerSpa';
+import MiniPlayerSpa from './miniPlayerSpa';
 import '../scss/amrapPage.scss';
 import AmrapContext from './contextProvider';
-
-// var popStateEvent = new PopStateEvent('popstate', { state: history });
-// dispatchEvent(popStateEvent);
 
 class Program extends Component {
   constructor (props) {
@@ -23,7 +20,7 @@ class Program extends Component {
       episodeList: [],
       currentEpisode: {},
       playlist: null,
-      audioState: 'stopped', // playing | stopped | paused | loading
+      audioState: 'stopped',
       path: window.location.pathname,
       tabValue: 0,
       loadingPlaylist: false
@@ -31,10 +28,6 @@ class Program extends Component {
     this.getApi = this.getApi.bind(this);
     this.handleTabChange = this.handleTabChange.bind(this);
 
-    // window.addEventListener('popstate', function (p) {
-    // });
-    // let hstate = window.location.pathname;
-    // history.pushState(hstate, '', window.location.href);
     let self = this;
     // eslint-disable-next-line no-undef
     var realPushState = history.pushState;
@@ -43,8 +36,6 @@ class Program extends Component {
       self.setState({
         path: arg1
       });
-      // self.forceUpdate();
-
       // eslint-disable-next-line no-undef
       return realPushState.apply(history, [
         null,
@@ -56,55 +47,54 @@ class Program extends Component {
 
   async componentDidMount () {
     let { audioFile, callSign } = this.props;
-
-    // TODO fix click second button
-    // TODO sharedstate for toplaer (eg on stop - doesnt update button)
     // TODO playlists?
     // TODO fix window vars in index
     // TODO fix time in popout player - handleupdate
     // TODO general cleanup
-    if (callSign) {
-      const pattern = new UrlPattern('/program(/:name)(/:episode)(/:track)');
-      let urlPaths = pattern.match(window.location.pathname);
-      if (urlPaths.name) {
-        let program = await this.getApi(
-          `http://staging.airnet.org.au/rest/stations/${callSign}/programs/${urlPaths.name}`
-        );
-        let episodes = await this.getApi(
-          `http://staging.airnet.org.au/rest/stations/${callSign}/programs/${urlPaths.name}/episodes`
-        );
-        let episodeList = episodes.slice(0, 10);
-        let curEp = episodes.filter((ep) => ep.currentEpisode);
-        let episode = await this.getApi(curEp[0].episodeRestUrl);
-        let playlist = await this.getApi(episode.playlistRestUrl);
+    // if (callSign) {
+    const pattern = new UrlPattern('/program(/:name)(/:episode)(/:track)');
+    let urlPaths = pattern.match(window.location.pathname);
+    if (urlPaths) {
+      let program = await this.getApi(
+        `http://staging.airnet.org.au/rest/stations/${callSign}/programs/${urlPaths.name}`
+      );
+      let episodes = await this.getApi(
+        `http://staging.airnet.org.au/rest/stations/${callSign}/programs/${urlPaths.name}/episodes`
+      );
+      let episodeList = episodes.slice(0, 10);
+      let curEp = episodes.filter((ep) => ep.currentEpisode);
+      let episode = await this.getApi(curEp[0].episodeRestUrl);
+      let playlist = await this.getApi(episode.playlistRestUrl);
 
-        audioFile = audioFile.replace('???PROGRAM???', urlPaths.name);
-        audioFile = audioFile.replace('???EPISODE???', dayjs(episode.start).format('YYYYMMDDHHss'));
-        // http://media.emit.com/pbs/5ft-high-rising/201901190600/aac_mid.m4a
-        episodeList.forEach((episode) => {
-          episode.dateLabel = dayjs(episode.start).format("ddd DD MMM 'YY");
-        });
+      let newaudioFile = this.props.audioFile.replace('???PROGRAM???', urlPaths.name);
+      newaudioFile = newaudioFile.replace('???EPISODE???', dayjs(episode.start).format('YYYYMMDDHHss'));
+      episodeList.forEach((episode) => {
+        episode.dateLabel = dayjs(episode.start).format("ddd DD MMM 'YY");
+      });
 
-        playlist.forEach((track) => {
-          track.url = audioFile;
-        });
+      playlist.forEach((track) => {
+        track.url = newaudioFile;
+      });
 
-        this.setState({
-          thisPage: window.location.href,
-          program: program,
-          episodeList: episodeList,
-          currentEpisode: curEp[0],
-          playlist: playlist,
-          tabValue: episodeList.length - 1
-        });
-      }
+      this.setState({
+        thisPage: window.location.href,
+        program: program,
+        episodeList: episodeList,
+        currentEpisode: curEp[0],
+        playlist: playlist,
+        tabValue: episodeList.length - 1
+      });
     }
+    // }
   }
 
   async componentDidUpdate (prevProps, prevState) {
     let { audioFile, callSign } = this.props;
 
     if (prevState.path !== this.state.path) {
+      console.log('====================================');
+      console.log(this.state);
+      console.log('====================================');
       let paths = this.state.path.split('/');
       let programName = paths[2];
       let program = await this.getApi(`http://staging.airnet.org.au/rest/stations/${callSign}/programs/${programName}`);
@@ -117,7 +107,6 @@ class Program extends Component {
 
       audioFile = audioFile.replace('???PROGRAM???', programName);
       audioFile = audioFile.replace('???EPISODE???', dayjs(episode.start).format('YYYYMMDDHHss'));
-      // http://media.emit.com/pbs/5ft-high-rising/201901190600/aac_mid.m4a
       episodeList.forEach((episode) => {
         episode.dateLabel = dayjs(episode.start).format("ddd DD MMM 'YY");
       });
@@ -143,12 +132,13 @@ class Program extends Component {
       });
       let episode = await this.getApi(this.state.currentEpisode.episodeRestUrl);
       let playlist = await this.getApi(episode.playlistRestUrl);
-      playlist.forEach((track) => {
-        track.url = audioFile;
-      });
 
       audioFile = audioFile.replace('???PROGRAM???', this.state.program.name);
       audioFile = audioFile.replace('???EPISODE???', dayjs(this.state.currentEpisode.start).format('YYYYMMDDHHss'));
+
+      playlist.forEach((track) => {
+        track.url = audioFile;
+      });
 
       this.setState({
         playlist: playlist,
